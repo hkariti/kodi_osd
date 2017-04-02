@@ -41,7 +41,7 @@ if wifi_name == 'hkariti':
     else:
         empty_notif()
 elif wifi_name  == 'BigPanda':
-    cast = pychromecast.get_chromecast(friendly_name='Office Music')
+    cast = pychromecast.get_chromecast(friendly_name='What Does Cast')
     status = cast.media_controller.status
     count = 0
     while status.player_state == 'UNKNOWN':
