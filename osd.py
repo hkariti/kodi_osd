@@ -5,7 +5,7 @@ import pychromecast
 import sys
 import time
 
-KODI_HOST = 'osmc.'
+KODI_HOST = [ 'osmc.', 'osmc.local.' ]
 KODI_PORT = 80
 TERMINAL_NOTIFIER = '/Library/Ruby/Gems/2.0.0//gems/terminal-notifier-1.6.3/bin/terminal-notifier'
 GET_WIFI_NAME = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk  '/ SSID/ {print $NF}'"
@@ -28,7 +28,13 @@ def empty_notif():
 wifi_name = subprocess.check_output(GET_WIFI_NAME, shell=True).replace("\n", "")
 
 if wifi_name == 'hkariti':
-    kodi = Kodi(KODI_HOST, KODI_PORT)
+    for host in KODI_HOST:
+        try:
+            kodi = Kodi(host, KODI_PORT)
+        except Exception as e:
+            print "Failed to connect to {0}, skipping. error was: {1}".format(host, str(e))
+    if not kodi:
+        raise RuntimeError("All hosts failed, can't connect to kodi!")
     players = kodi.jsonrpc('Player.GetActivePlayers')
     if players:
         playing = kodi.jsonrpc('Player.GetItem', params=dict(playerid=players[0]["playerid"], properties=["track", "artist", "album", "title", "thumbnail"]))
